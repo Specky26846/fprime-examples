@@ -38,3 +38,4 @@ jobs:
           fprime_version: devel
           skip_requirements_install: true
           extra_generate_args: "-DFPRIME_EXAMPLES_USE_OPENCV=ON"
+          extra_test_args: "-s -v"
