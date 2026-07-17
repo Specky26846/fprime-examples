@@ -7,21 +7,24 @@ from fprime_gds.common.dp.decoder import DataProductDecoder
 def test_dp_send(fprime_test_api):
     """Test that DPs are generated and received on the ground"""
 
-    # Run Dp command to send a data product
+    # Run Dp command to send a data product - compressed!
     fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
+        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
     )
     # Wait for DpStarted event
     result = fprime_test_api.await_event("Ref.dpDemo.DpStarted", start=0, timeout=5)
     assert result
+
     # Wait for DpComplete event
     result = fprime_test_api.await_event("Ref.dpDemo.DpComplete", start=0, timeout=10)
     assert result
+
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
     )
     dp_file_path = file_result.get_display_text().split().pop()
+    
     # Verify that the file exists. The FSW writes ./DpCat relative to its
     # working directory, so the test must run from that same directory.
     assert Path(dp_file_path).is_file()
@@ -39,9 +42,11 @@ def test_dp_decode(fprime_test_api):
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
     )
     dp_file_path = file_result.get_display_text().split().pop()
+    
     # Verify that the file exists. The FSW writes ./DpCat relative to its
     # working directory, so the test must run from that same directory.
     assert Path(dp_file_path).is_file(), "Dp file not downlinked correctly"
+    
     # Decode DP file
     decoded_file_name = Path(dp_file_path).name.replace(".fdp", ".json")
     DataProductDecoder(
