@@ -28,7 +28,7 @@ def test_dp_send(fprime_test_api):
 
 
 def test_dp_decode(fprime_test_api):
-    """Test that we can decode compressed DPs on the ground via DataProductDecoder (`fprime-dp decode`)"""
+    """Test decoding DPs via DataProductDecoder with PROC_TYPE_LOSSLESS - compressed"""
 
     # Run Dp command to send a data product WITH LOSSLESS COMPRESSION
     fprime_test_api.send_and_assert_command(
