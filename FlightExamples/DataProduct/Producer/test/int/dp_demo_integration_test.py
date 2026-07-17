@@ -6,60 +6,45 @@ from fprime_gds.common.dp.decoder import DataProductDecoder
 
 def test_dp_send(fprime_test_api):
     """Test that DPs are generated and received on the ground"""
-    print("Starting test_dp_send")
-
-    # Run Dp command to send a data product - compressed!
-    fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
-    )
-    print("Sent Dp (lossless compression) command")
-
-    # Wait for DpStarted event
-    result = fprime_test_api.await_event("Ref.dpDemo.DpStarted", start=0, timeout=5)
-    assert result, "DpStarted event not received"
-    print(f"✓ DpStarted event received: {result.get_display_text()}")
-
-    # Wait for DpComplete event
-    result = fprime_test_api.await_event("Ref.dpDemo.DpComplete", start=0, timeout=10)
-    assert result, "DpComplete event not received"
-    print(f"✓ DpComplete event received: {result.get_display_text()}")
-
-    # Check for FileWritten event and capture the name of the file that was created
-    file_result = fprime_test_api.await_event(
-        "DataProducts.dpWriter.FileWritten", start=0, timeout=10
-    )
-    dp_file_path = file_result.get_display_text().split().pop()
-    print(f"✓ FileWritten event received - file path: {dp_file_path}")
-
-    # Verify that the file exists. The FSW writes ./DpCat relative to its
-    # working directory, so the test must run from that same directory.
-    print(f"Verifying file exists at: {dp_file_path}")
-    assert Path(dp_file_path).is_file(), f"Data product file not found at: {dp_file_path}"
-    print(f"✓ File verified - size: {Path(dp_file_path).stat().st_size} bytes")
-
-
-def test_dp_decode(fprime_test_api):
-    """Test that we can decode DPs on the ground via DataProductDecoder (`fprime-dp decode`)"""
-    print("Starting test_dp_decode")
 
     # Run Dp command to send a data product
     fprime_test_api.send_and_assert_command(
         "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
     )
-    print("Sent Dp (no compression) command")
-
+    # Wait for DpStarted event
+    result = fprime_test_api.await_event("Ref.dpDemo.DpStarted", start=0, timeout=5)
+    assert result
+    # Wait for DpComplete event
+    result = fprime_test_api.await_event("Ref.dpDemo.DpComplete", start=0, timeout=10)
+    assert result
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
     )
     dp_file_path = file_result.get_display_text().split().pop()
-    print(f"✓ FileWritten event received - file path: {dp_file_path}")
+    # Verify that the file exists. The FSW writes ./DpCat relative to its
+    # working directory, so the test must run from that same directory.
+    assert Path(dp_file_path).is_file()
+
+
+def test_dp_decode(fprime_test_api):
+    """Test that we can decode compressed DPs on the ground via DataProductDecoder (`fprime-dp decode`)"""
+
+    # Run Dp command to send a data product WITH LOSSLESS COMPRESSION
+    fprime_test_api.send_and_assert_command(
+        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
+    )
+    # Check for FileWritten event and capture the name of the file that was created
+    file_result = fprime_test_api.await_event(
+        "DataProducts.dpWriter.FileWritten", start=0, timeout=10
+    )
+    dp_file_path = file_result.get_display_text().split().pop()
     # Verify that the file exists. The FSW writes ./DpCat relative to its
     # working directory, so the test must run from that same directory.
     assert Path(dp_file_path).is_file(), "Dp file not downlinked correctly"
-    print(f"✓ File verified - size: {Path(dp_file_path).stat().st_size} bytes")
 
-    # Decode DP file
+    # Decode DP file - THIS IS THE KEY TEST FOR COMPRESSION/DECOMPRESSION
+    # If decompression doesn't work, this will fail
     decoded_file_name = Path(dp_file_path).name.replace(".fdp", ".json")
     DataProductDecoder(
         fprime_test_api.dictionaries, dp_file_path, decoded_file_name
@@ -72,10 +57,20 @@ def test_dp_decode(fprime_test_api):
     ) as output_file:
         ref_json = json.load(ref_file)
         output_json = json.load(output_file)
+
+        # Verify that ProcTypes indicates compression was used
+        assert output_json["Header"]["ProcTypes"]["value"] == 1, \
+            f"Expected ProcTypes=1 (lossless), got {output_json['Header']['ProcTypes']['value']}"
+
         # Exclude Time and Checksum header fields since the timestamp will change every time
         ref_json["Header"].pop("Time")
         output_json["Header"].pop("Time")
         ref_json["Header"].pop("Checksum")
         output_json["Header"].pop("Checksum")
-        # Every other fields in Header and Data should be exactly the same
-        assert ref_json == output_json
+        # Exclude ProcTypes since ref uses NONE (0) but this test uses LOSSLESS (1)
+        ref_json["Header"].pop("ProcTypes")
+        output_json["Header"].pop("ProcTypes")
+
+        # Every other field in Header and Data should be exactly the same
+        # This proves decompression correctly recovered the original data
+        assert ref_json == output_json, "Decompressed data does not match reference"
