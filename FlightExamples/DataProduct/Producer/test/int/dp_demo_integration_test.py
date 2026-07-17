@@ -6,47 +6,59 @@ from fprime_gds.common.dp.decoder import DataProductDecoder
 
 def test_dp_send(fprime_test_api):
     """Test that DPs are generated and received on the ground"""
+    print("Starting test_dp_send")
 
     # Run Dp command to send a data product - compressed!
     fprime_test_api.send_and_assert_command(
         "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
     )
+    print("Sent Dp (lossless compression) command")
+
     # Wait for DpStarted event
     result = fprime_test_api.await_event("Ref.dpDemo.DpStarted", start=0, timeout=5)
-    assert result
+    assert result, "DpStarted event not received"
+    print(f"✓ DpStarted event received: {result.get_display_text()}")
 
     # Wait for DpComplete event
     result = fprime_test_api.await_event("Ref.dpDemo.DpComplete", start=0, timeout=10)
-    assert result
+    assert result, "DpComplete event not received"
+    print(f"✓ DpComplete event received: {result.get_display_text()}")
 
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
     )
     dp_file_path = file_result.get_display_text().split().pop()
-    
+    print(f"✓ FileWritten event received - file path: {dp_file_path}")
+
     # Verify that the file exists. The FSW writes ./DpCat relative to its
     # working directory, so the test must run from that same directory.
-    assert Path(dp_file_path).is_file()
+    print(f"Verifying file exists at: {dp_file_path}")
+    assert Path(dp_file_path).is_file(), f"Data product file not found at: {dp_file_path}"
+    print(f"✓ File verified - size: {Path(dp_file_path).stat().st_size} bytes")
 
 
 def test_dp_decode(fprime_test_api):
     """Test that we can decode DPs on the ground via DataProductDecoder (`fprime-dp decode`)"""
+    print("Starting test_dp_decode")
 
     # Run Dp command to send a data product
     fprime_test_api.send_and_assert_command(
         "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
     )
+    print("Sent Dp (no compression) command")
+
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
     )
     dp_file_path = file_result.get_display_text().split().pop()
-    
+    print(f"✓ FileWritten event received - file path: {dp_file_path}")
     # Verify that the file exists. The FSW writes ./DpCat relative to its
     # working directory, so the test must run from that same directory.
     assert Path(dp_file_path).is_file(), "Dp file not downlinked correctly"
-    
+    print(f"✓ File verified - size: {Path(dp_file_path).stat().st_size} bytes")
+
     # Decode DP file
     decoded_file_name = Path(dp_file_path).name.replace(".fdp", ".json")
     DataProductDecoder(
