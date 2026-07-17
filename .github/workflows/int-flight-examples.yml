@@ -1,0 +1,41 @@
+name: FlightExamples INTs
+
+on:
+  push:
+    branches: [ devel, release/**, pattern/** ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ devel, release/** ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.github/actions/spelling/**'
+      - '.github/ISSUE_TEMPLATE/**'
+
+
+jobs:
+  build:
+    name: ""
+    runs-on: ubuntu-latest
+    container: 
+      image: ghcr.io/fprime-community/fprime-examples-builder:latest
+
+    steps:
+      - name: "Checkout Examples repo"
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: "Set up F Prime environment"
+        run: pip3 install --break-system-packages -U -r https://raw.githubusercontent.com/nasa/fprime/devel/requirements.txt
+
+      - name: "Build & Tests"
+        uses: fprime-community/project-builder@main
+        with:
+          run_unit_tests: true
+          run_integration_tests: true
+          build_location: ./FlightExamples
+          fprime_location: ./FlightExamples/lib/fprime
+          fprime_version: devel
+          skip_requirements_install: true
+          extra_generate_args: "-DFPRIME_EXAMPLES_USE_OPENCV=ON"
