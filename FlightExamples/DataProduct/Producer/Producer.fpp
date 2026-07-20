@@ -10,6 +10,14 @@ module DataProduct {
         @ Schedule input port
         sync input port run: Svc.Sched
 
+        @ Command for generating a DP
+        sync command Dp(reqType: DpReqType, $priority: U32, proc: Fw.DpCfg.ProcType)
+
+        enum DpReqType {
+            IMMEDIATE
+            ASYNC
+        }
+
         @ Data product record for sine wave
         product record SineRecord: SinusoidRecordType id 0
 
@@ -39,5 +47,21 @@ module DataProduct {
 
         @ For sending events
         import Fw.Event
+
+        @ DP started event
+        event DpStarted(records: U32) severity activity low id 1 format "Writing {} DP records"
+
+        @ DP complete event  
+        event DpComplete(records: U32) severity activity low id 2 format "Finished writing {} DP records"
+
+        @ Port for sending command registrations
+        command reg port cmdRegOut
+
+        @ Port for receiving commands
+        command recv port cmdIn
+
+        @ Port for sending command responses
+        command resp port cmdResponseOut
+
     }
 }

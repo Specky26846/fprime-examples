@@ -9,13 +9,13 @@ def test_dp_send(fprime_test_api):
 
     # Run Dp command to send a data product
     fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
     )
     # Wait for DpStarted event
-    result = fprime_test_api.await_event("Ref.dpDemo.DpStarted", start=0, timeout=5)
+    result = fprime_test_api.await_event("ExamplesDeployment.dpProducer.DpStarted", start=0, timeout=5)
     assert result
     # Wait for DpComplete event
-    result = fprime_test_api.await_event("Ref.dpDemo.DpComplete", start=0, timeout=10)
+    result = fprime_test_api.await_event("ExamplesDeployment.dpProducer.DpComplete", start=0, timeout=10)
     assert result
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
@@ -32,7 +32,7 @@ def test_dp_decode(fprime_test_api):
 
     # Run Dp command to send a data product WITH LOSSLESS COMPRESSION
     fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
     )
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
@@ -43,7 +43,7 @@ def test_dp_decode(fprime_test_api):
     # working directory, so the test must run from that same directory.
     assert Path(dp_file_path).is_file(), "Dp file not downlinked correctly"
 
-    # Decode DP file - THIS IS THE KEY TEST FOR COMPRESSION/DECOMPRESSION
+    # Decode DP file - KEY TEST FOR COMPRESSION/DECOMPRESSION
     # If decompression doesn't work, this will fail
     decoded_file_name = Path(dp_file_path).name.replace(".fdp", ".json")
     DataProductDecoder(
@@ -80,7 +80,7 @@ def test_dp_decode_proc_type_none(fprime_test_api):
     """Test decoding DPs with PROC_TYPE_NONE - baseline/uncompressed"""
 
     fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_NONE"]
     )
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
@@ -106,7 +106,7 @@ def test_dp_decode_proc_type_lossy(fprime_test_api):
     """Test decoding DPs with PROC_TYPE_LOSSY - verifies lossy compression/decompression works"""
 
     fprime_test_api.send_and_assert_command(
-        "Ref.dpDemo.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSY"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSY"]
     )
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10

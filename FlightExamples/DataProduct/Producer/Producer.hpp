@@ -41,6 +41,20 @@ class Producer final : public ProducerComponentBase {
     FwSizeType m_count;       //!< Count of serialized records
     DpContainer m_container;  //!< Data product container (currently allocated)
     bool m_containerValid;    //!< Whether the container is valid
+
+  private:
+    // ----------------------------------------------------------------------
+    // Handler implementations for commands
+    // ----------------------------------------------------------------------
+
+    //! Handler implementation for command Dp
+    //!
+    //! Command for generating a DP
+    void Dp_cmdHandler(FwOpcodeType opCode,  //!< The opcode
+                       U32 cmdSeq,           //!< The command sequence number
+                       const DataProduct::Producer_DpReqType& reqType,
+                       U32 priority,
+                       const Fw::DpCfg::ProcType& proc) override;
 };
 
 }  // namespace DataProduct
