@@ -30,9 +30,9 @@ def test_dp_send(fprime_test_api):
 def test_dp_decode(fprime_test_api):
     """Test decoding DPs via DataProductDecoder with PROC_TYPE_LOSSLESS - compressed"""
 
-    # Run Dp command to send a data product WITH LOSSLESS COMPRESSION
+    # Run Dp command to send a data product WITH ZLIB_DEFLATE COMPRESSION
     fprime_test_api.send_and_assert_command(
-        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSLESS"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_ZLIB_DEFLATE"]
     )
     # Check for FileWritten event and capture the name of the file that was created
     file_result = fprime_test_api.await_event(
@@ -60,7 +60,7 @@ def test_dp_decode(fprime_test_api):
 
         # Verify that ProcTypes indicates compression was used
         assert output_json["Header"]["ProcTypes"]["value"] == 1, \
-            f"Expected ProcTypes=1 (lossless), got {output_json['Header']['ProcTypes']['value']}"
+            f"Expected ProcTypes=1 (ZLIB_DEFLATE), got {output_json['Header']['ProcTypes']['value']}"
 
         # Exclude Time and Checksum header fields since the timestamp will change every time
         ref_json["Header"].pop("Time")
@@ -103,10 +103,10 @@ def test_dp_decode_proc_type_none(fprime_test_api):
 
 
 def test_dp_decode_proc_type_lossy(fprime_test_api):
-    """Test decoding DPs with PROC_TYPE_LOSSY - verifies lossy compression/decompression works"""
+    """Test decoding DPs with PROC_TYPE_ONE - verifies compression/decompression works"""
 
     fprime_test_api.send_and_assert_command(
-        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_LOSSY"]
+        "ExamplesDeployment.dpProducer.Dp", ["IMMEDIATE", 1, "PROC_TYPE_ONE"]
     )
     file_result = fprime_test_api.await_event(
         "DataProducts.dpWriter.FileWritten", start=0, timeout=10
@@ -124,9 +124,9 @@ def test_dp_decode_proc_type_lossy(fprime_test_api):
     with open(decoded_file_name, "r") as output_file:
         output_json = json.load(output_file)
 
-        # Verify that ProcTypes indicates lossy compression was used
+        # Verify that ProcTypes indicates compression was used
         assert output_json["Header"]["ProcTypes"]["value"] == 2, \
-            f"Expected ProcTypes=2 (lossy), got {output_json['Header']['ProcTypes']['value']}"
+            f"Expected ProcTypes=2 (PROC_TYPE_ONE), got {output_json['Header']['ProcTypes']['value']}"
 
         # Verify basic structure is intact (lossy may have data loss, so no exact comparison)
         assert "Header" in output_json, "Missing Header in decoded lossy DP"
