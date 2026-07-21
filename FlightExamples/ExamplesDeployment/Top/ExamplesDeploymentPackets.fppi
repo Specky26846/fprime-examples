@@ -93,6 +93,12 @@ telemetry packets Packets {
     DataProducts.dpBufferManager.EmptyBuffs
 
     DataProducts.dpBufferAccumulator.BA_NumQueuedBuffers
+
+    DpCompression.dpZLibCompressorBufferManager.TotalBuffs
+    DpCompression.dpZLibCompressorBufferManager.CurrBuffs
+    DpCompression.dpZLibCompressorBufferManager.HiBuffs
+    DpCompression.dpZLibCompressorBufferManager.NoBuffs
+    DpCompression.dpZLibCompressorBufferManager.EmptyBuffs
   }
 
   packet Sine id 21 group 3 {
