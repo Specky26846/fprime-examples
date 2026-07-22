@@ -20,4 +20,5 @@ register_fprime_module(
         Fw_Logger
         ExampleCdhCoreConfig
         CustomFraming_DecafFrameDetector
+        Svc_Subtopologies_DpCompression
 )
