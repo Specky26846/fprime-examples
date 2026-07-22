@@ -15,7 +15,7 @@
 #include "Svc/Subtopologies/CdhCore/SubtopologyTopologyDefs.hpp"
 #include "Svc/Subtopologies/DataProducts/SubtopologyTopologyDefs.hpp"
 #include "Svc/Subtopologies/FileHandling/SubtopologyTopologyDefs.hpp"
-
+#include "Svc/Subtopologies/DpCompression/SubtopologyTopologyDefs.hpp"
 #include "ExternalLibs/Subtopology/ExternalLibsTopologyDefs.hpp"
 #include "ManagerWorker/Subtopology/ManagerWorkerTopologyDefs.hpp"
 
