@@ -21,7 +21,4 @@ register_fprime_module(
         ExampleCdhCoreConfig
         CustomFraming_DecafFrameDetector
         Svc_Subtopologies_DpCompression
-        Svc_DpCompressProc
-        Svc_DpZLibCompressor
-        Svc_BufferManager
 )
