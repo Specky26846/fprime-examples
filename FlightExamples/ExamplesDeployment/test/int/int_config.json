@@ -1,6 +1,6 @@
 {
     "Svc.CommandDispatcher": "CdhCore.cmdDisp",
-    "Svc.CmdSequencer": "cmdSeq",
+    "Svc.CmdSequencer": "ExamplesDeployment.cmdSeq",
     "Svc.FileDownlink": "FileHandling.fileDownlink",
     "Svc.FileManager": "FileHandling.fileManager",
     "Svc.FileUplink": "FileHandling.fileUplink",
@@ -11,5 +11,5 @@
     "Svc.DpCatalog": "DataProducts.dpCat",
     "Svc.DpManager": "DataProducts.dpMgr",
     "Svc.DpWriter": "DataProducts.dpWriter",
-    "Svc.Health": "CdhCore.health"
+    "Svc.Health": "CdhCore.$health"
 }
