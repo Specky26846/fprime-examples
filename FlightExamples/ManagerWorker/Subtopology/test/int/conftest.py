@@ -32,13 +32,14 @@ def pytest_configure(config):
 
     if not config.option.deployment:
         # Point to ExamplesDeployment build artifacts
-        build_root = flight_examples / "build-artifacts"
+        # Use CI artifact structure: <platform>-artifacts/ExamplesDeployment at repo root
+        repo_root = flight_examples.parent
 
-        # Try common build artifact locations for the deployment
+        # Try common platform artifact locations for the deployment
         possible_builds = [
-            build_root / "Darwin" / "ExamplesDeployment",
-            build_root / "aarch64-linux" / "ExamplesDeployment",
-            build_root / "Linux" / "ExamplesDeployment",
+            repo_root / "aarch64-linux-artifacts" / "ExamplesDeployment",
+            repo_root / "Darwin-artifacts" / "ExamplesDeployment",
+            repo_root / "Linux-artifacts" / "ExamplesDeployment",
         ]
 
         for build_path in possible_builds:
@@ -51,14 +52,8 @@ def pytest_configure(config):
                 break
         else:
             # If no build found, provide helpful error message
-            if not build_root.exists():
-                pytest.exit(
-                    f"Build artifacts not found. Please build ExamplesDeployment first.\n"
-                    f"Expected build root: {build_root}"
-                )
-            else:
-                pytest.exit(
-                    f"ExamplesDeployment build not found in build artifacts.\n"
-                    f"Searched: {[str(p) for p in possible_builds]}\n"
-                    f"Please build ExamplesDeployment before running integration tests."
-                )
+            pytest.exit(
+                f"ExamplesDeployment build not found in artifact directories.\n"
+                f"Searched: {[str(p) for p in possible_builds]}\n"
+                f"Please build ExamplesDeployment before running integration tests."
+            )
