@@ -12,6 +12,10 @@ project(FlightExamples C CXX)
 ###
 include("${CMAKE_CURRENT_LIST_DIR}/lib/fprime/cmake/FPrime.cmake")
 # NOTE: register custom targets between these two lines
+
+# Find ZLIB (required by DpCompression subtopology)
+find_package(ZLIB REQUIRED)
+
 fprime_setup_included_code()
 
 
