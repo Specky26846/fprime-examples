@@ -44,6 +44,10 @@ def pytest_configure(config):
         for build_path in possible_builds:
             if build_path.exists() and (build_path / "bin").exists():
                 config.option.deployment = build_path
+                # Also set the dictionary path to ExamplesDeployment
+                dict_file = build_path / "ExamplesDeploymentAppDictionary.xml"
+                if dict_file.exists() and not config.option.dictionary:
+                    config.option.dictionary = str(dict_file)
                 break
         else:
             # If no build found, provide helpful error message
