@@ -67,7 +67,8 @@ void DecafDeframer ::dataIn_handler(FwIndexType portNum, Fw::Buffer& data, const
     FW_ASSERT(status == Fw::SerializeStatus::FW_SERIALIZE_OK, status);
     ComCfg::FrameContext contextCopy = context;
     // If a valid descriptor is deserialized, set it in the context
-    if (packetDescriptor < ComCfg::Apid::INVALID_UNINITIALIZED) {
+    if ((packetDescriptor < ComCfg::Apid::INVALID_UNINITIALIZED) &&
+        ComCfg::Apid::isValid(static_cast<ComCfg::Apid::SerialType>(packetDescriptor))) {
         contextCopy.set_apid(static_cast<ComCfg::Apid::T>(packetDescriptor));
     }
 
