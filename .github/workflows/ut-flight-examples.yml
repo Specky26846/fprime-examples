@@ -26,6 +26,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: "Install ZLIB development libraries"
+        run: |
+          sed -i 's|http://archive.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || sed -i 's|http://archive.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list
+          sed -i 's|http://security.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || sed -i 's|http://security.ubuntu.com/ubuntu|http://old-releases.ubuntu.com/ubuntu|g' /etc/apt/sources.list
+          apt-get update && apt-get install -y zlib1g-dev zlib1g-dev:arm64
+
       - name: "Set up F Prime environment"
         run: |
           curl -sSL https://raw.githubusercontent.com/nasa/fprime/devel/requirements.txt -o /tmp/requirements.txt
