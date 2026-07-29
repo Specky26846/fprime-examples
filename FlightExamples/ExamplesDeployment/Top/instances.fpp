@@ -47,7 +47,7 @@ module ExamplesDeployment {
     priority 117
 
   instance comQueue: Svc.ComQueue base id 0x10005000 \
-      queue size Default.QUEUE_SIZE \
+      queue size 50 \
       stack size Default.STACK_SIZE \
       priority 101
 
