@@ -27,7 +27,10 @@ jobs:
           submodules: recursive
 
       - name: "Set up F Prime environment"
-        run: pip3 install --break-system-packages -U -r FlightExamples/lib/fprime/requirements.txt
+        run: |
+          curl -sSL https://raw.githubusercontent.com/nasa/fprime/devel/requirements.txt -o /tmp/requirements.txt
+          sed -i 's/crcmod/crcmod-plus/g' /tmp/requirements.txt
+          pip3 install --break-system-packages -U -r /tmp/requirements.txt
 
       - name: "Build & UTs"
         uses: fprime-community/project-builder@main
