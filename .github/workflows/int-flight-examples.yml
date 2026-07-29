@@ -26,8 +26,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: "Install ZLIB development libraries"
+        run: apt-get update && apt-get install -y zlib1g-dev zlib1g-dev:arm64
+
       - name: "Set up F Prime environment"
-        run: pip3 install --break-system-packages -U -r https://raw.githubusercontent.com/nasa/fprime/devel/requirements.txt
+        run: pip3 install --break-system-packages -U -r FlightExamples/lib/fprime/requirements.txt
 
       - name: "Build & Tests"
         uses: fprime-community/project-builder@main
