@@ -1,6 +1,6 @@
 {
     "Svc.CommandDispatcher": "CdhCore.cmdDisp",
-    "Svc.CmdSequencer": "ManagerWorker.cmdSeq",
+    "Svc.CmdSequencer": "ExamplesDeployment.cmdSeq",
     "Svc.FileDownlink": "FileHandling.fileDownlink",
     "Svc.FileManager": "FileHandling.fileManager",
     "Svc.FileUplink": "FileHandling.fileUplink",
