@@ -186,7 +186,9 @@ module ExamplesDeployment {
     }
 
     connections ExamplesDeployment {
-
+      # ManagerWorker health connections
+      CdhCore.$health.PingSend[0] -> ManagerWorker.manager.pingIn
+      ManagerWorker.manager.pingOut -> CdhCore.$health.PingReturn[0]
     }
 
   }
